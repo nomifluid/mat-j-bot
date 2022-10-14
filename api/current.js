@@ -1,13 +1,13 @@
-const getCurrent = require('../../functions/getCurrent')
-const webhookClient = require('../../utils/webhookClient')
+const getCurrent = require('../functions/getCurrent')
+const webhookClient = require('../utils/webhookClient')
 
-module.exports = function handler(request, response) {
+module.exports = async function handler(request, response) {
   const {
     stopId,
     routeName
   } = request.query
   try {
-    const result = getCurrent({
+    const result = await getCurrent({
       stopId,
       routeName
     })
