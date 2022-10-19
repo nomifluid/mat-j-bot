@@ -29,14 +29,16 @@ async function getCurrent({
     }
   })
   const firstArrival = departures.filter(x => x.route.short_name === routeName)[0]
-
+  if (!firstArrival) return null;
   return {
+    route_name: firstArrival.route.name,
+    headsign: firstArrival.headsign,
+    stop_name: firstArrival.stop.name,
     cancel: firstArrival.trip.is_canceled,
     delay: firstArrival.delay.is_available,
     delay_min: firstArrival.delay.minutes || 0,
     scheduled_departure: firstArrival.departure_timestamp.scheduled,
     estimated_departure: firstArrival.departure_timestamp.predicted
-
   }
 
 }

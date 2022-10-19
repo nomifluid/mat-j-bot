@@ -5,7 +5,6 @@ const {
   RSS_URL
 } = require("../config.json");
 
-// {timeStart, timeEnd, lineId}
 async function getPlanned({
   routeName
 }) {
@@ -45,7 +44,8 @@ async function getPlanned({
           cancel: title.includes("neodjetí"),
           delay: title.includes("zpoždění"),
           disruption: true,
-          disruption_text: title
+          disruption_title: title,
+          disruption_text: description
         });
       }
     }
