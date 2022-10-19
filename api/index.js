@@ -28,6 +28,8 @@ module.exports = async function handler(request, response) {
         success: false,
         content
       })
+
+      return
     }
 
     const fields = [{
