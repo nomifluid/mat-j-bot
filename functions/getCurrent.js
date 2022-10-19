@@ -32,7 +32,7 @@ async function getCurrent({
   if (!firstArrival) return null;
   return {
     route_name: firstArrival.route.name,
-    headsign: firstArrival.headsign,
+    headsign: firstArrival.trip.headsign,
     stop_name: firstArrival.stop.name,
     cancel: firstArrival.trip.is_canceled,
     delay: firstArrival.delay.is_available,

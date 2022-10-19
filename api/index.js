@@ -57,8 +57,8 @@ module.exports = async function handler(request, response) {
       value: planned.disruption_text
     })
     const embed = new EmbedBuilder().setTitle(`${routeName}, směr ${current.headsign}, ze zastávky ${current.stop_name}`).setColor(0x00FFFF).addFields(fields)
-    let content = current.delay ? '' : 'Spoj jede včas. '
-    if (current.delay) content = `${routeName} →${current.headsign}: Spoj bude o ${current.delay_min} min opožděn.`
+    let content = (!current.delay || current.delay_min === 0) ? 'Spoj jede včas. ' : ''
+    if (current.delay_min > 0) content = `${routeName} →${current.headsign}: Spoj bude o ${current.delay_min} min opožděn.`
     if (current.cancel) content = 'Spoj je zrušen.'
     if (planned.cancel || planned.delay) content += `Spoje se týká mimořádnost: ${[planned.cancel, planned.delay].filter(Boolean).join(', ')} spoje.`
     await webhookClient.send({
