@@ -28,13 +28,12 @@ module.exports = async function handler(request, response) {
         success: false,
         content
       })
-
       return
     }
 
     const fields = [{
         name: 'Zpoždění',
-        value: `${current.delay_min || 'N/A'} min`
+        value: current.delay_min ? (current.delay_min + ' min') : 'nedostupné'
       },
       {
         name: 'Pravidelný odjezd',
@@ -53,14 +52,33 @@ module.exports = async function handler(request, response) {
 
     ]
     if (planned.disruption_title) fields.push({
-      name: planned.disruption_title,
-      value: planned.disruption_text
+      name: String(planned.disruption_title).toUpperCase(),
+      value: String(planned.disruption_text).replaceAll('&nbsp;', ' ')
     })
-    const embed = new EmbedBuilder().setTitle(`${routeName}, směr ${current.headsign}, ze zastávky ${current.stop_name}`).setColor(0x00FFFF).addFields(fields)
-    let content = (!current.delay || current.delay_min === 0) ? 'Spoj jede včas. ' : ''
-    if (current.delay_min > 0) content = `${routeName} →${current.headsign}: Spoj bude o ${current.delay_min} min opožděn.`
-    if (current.cancel) content = 'Spoj je zrušen.'
-    if (planned.cancel || planned.delay) content += `Spoje se týká mimořádnost: ${[planned.cancel, planned.delay].filter(Boolean).join(', ')} spoje.`
+
+    // HEADSIGN
+    const headsign = `${routeName} →${current.headsign}`
+
+    // SERVICE STATE
+    let serviceState = 'jede včas'
+    if (current.cancel) {
+      serviceState = 'je zrušen'
+    } else {
+      if (current.delay_min > 0)
+        serviceState = `je o ${current.delay_min} min opožděn`
+
+    }
+
+    // SERVICE DISRUPTION
+    let disruptions = []
+    if (planned.delay) disruptions.push('zpoždění spoje')
+    if (planned.cancel) disruptions.push('neodjetí spoje')
+    let serviceDisruption = ''
+    if (disruptions.length > 0) serviceDisruption = `Mimořádnost: ${disruptions.join(', ')}.`
+
+    let content = `${headsign}: Spoj ${serviceState}. ${serviceDisruption}`
+
+    const embed = new EmbedBuilder().setTitle(headsign).setColor(0x00FFFF).addFields(fields)
     await webhookClient.send({
       content,
       embeds: [embed]

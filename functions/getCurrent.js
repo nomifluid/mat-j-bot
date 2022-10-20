@@ -31,7 +31,7 @@ async function getCurrent({
   const firstArrival = departures.filter(x => x.route.short_name === routeName)[0]
   if (!firstArrival) return null;
   return {
-    route_name: firstArrival.route.name,
+    route_name: firstArrival.route.short_name,
     headsign: firstArrival.trip.headsign,
     stop_name: firstArrival.stop.name,
     cancel: firstArrival.trip.is_canceled,
