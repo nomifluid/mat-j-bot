@@ -10,7 +10,8 @@ const USERNAME = 'matěj stach'
 module.exports = async function handler(request, response) {
   const {
     stopId,
-    routeName
+    routeName,
+    silent = false,
   } = request.query
   try {
     const planned = await getPlanned({
@@ -23,7 +24,7 @@ module.exports = async function handler(request, response) {
 
     if (!current) {
       const content = `${routeName}: Nepodařilo se načíst nejbližší spoj.`
-      await webhookClient.send({
+      if (!silent) await webhookClient.send({
         content,
         username: USERNAME
       })
@@ -85,7 +86,7 @@ module.exports = async function handler(request, response) {
     let content = `${headsign}: Spoj ${serviceState}. ${serviceDisruption} ${contentDeparture}`
 
     const embed = new EmbedBuilder().setTitle(headsign).setColor(0x8F00FF).addFields(fields)
-    await webhookClient.send({
+    if (!silent) await webhookClient.send({
       username: USERNAME,
       content,
       embeds: [embed]
@@ -98,7 +99,7 @@ module.exports = async function handler(request, response) {
   } catch (error) {
     console.log(error);
     const content = `${routeName}: Nepodařilo se načíst informace o spoji.\n> ${error}`
-    await webhookClient.send({
+    if (!silent) await webhookClient.send({
       username: USERNAME,
       content,
     })
