@@ -5,6 +5,8 @@ const {
   EmbedBuilder
 } = require('discord.js')
 
+const USERNAME = 'matěj stach'
+
 module.exports = async function handler(request, response) {
   const {
     stopId,
@@ -23,6 +25,7 @@ module.exports = async function handler(request, response) {
       const content = `${routeName}: Nepodařilo se načíst nejbližší spoj.`
       await webhookClient.send({
         content,
+        username: USERNAME
       })
       response.status(200).send({
         success: false,
@@ -57,7 +60,7 @@ module.exports = async function handler(request, response) {
     })
 
     // HEADSIGN
-    const headsign = `${routeName} →${current.headsign}`
+    const headsign = `${routeName} ›${current.headsign}`
 
     // SERVICE STATE
     let serviceState = 'jede včas'
@@ -76,10 +79,14 @@ module.exports = async function handler(request, response) {
     let serviceDisruption = ''
     if (disruptions.length > 0) serviceDisruption = `Mimořádnost: ${disruptions.join(', ')}.`
 
-    let content = `${headsign}: Spoj ${serviceState}. ${serviceDisruption}`
+    const contentDeparture = current.estimated_departure ? `Odjezd: ${new Date(current.estimated_departure).toLocaleTimeString('cs-CZ', {
+          timeZone: 'Europe/Prague'
+        })}` : ''
+    let content = `${headsign}: Spoj ${serviceState}. ${serviceDisruption} ${contentDeparture}`
 
-    const embed = new EmbedBuilder().setTitle(headsign).setColor(0x00FFFF).addFields(fields)
+    const embed = new EmbedBuilder().setTitle(headsign).setColor(0x8F00FF).addFields(fields)
     await webhookClient.send({
+      username: USERNAME,
       content,
       embeds: [embed]
     })
@@ -92,6 +99,7 @@ module.exports = async function handler(request, response) {
     console.log(error);
     const content = `${routeName}: Nepodařilo se načíst informace o spoji.\n> ${error}`
     await webhookClient.send({
+      username: USERNAME,
       content,
     })
     response.status(200).send({
